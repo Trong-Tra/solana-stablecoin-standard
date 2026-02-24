@@ -39,19 +39,22 @@ pub struct StablecoinState {
 }
 
 impl StablecoinState {
+    // Space calculation with padding for variable-length strings
+    // String: 4 bytes (length) + actual string bytes
     pub const LEN: usize = 8 + // discriminator
         32 + // master_authority
         32 + // mint
-        4 + 32 + // name (max 32 chars)
-        4 + 10 + // symbol (max 10 chars)
-        4 + 200 + // uri (max 200 chars)
+        40 + // name (4 + 32 + 4 padding)
+        20 + // symbol (4 + 10 + 6 padding)
+        210 + // uri (4 + 200 + 6 padding)
         1 + // decimals
-        4 + // feature flags
+        4 + // feature flags (4 bools = 4 bytes)
         1 + // paused
         8 + // total_minted
         8 + // total_burned
         1 + // bump
-        1; // version
+        1 + // version
+        200; // Extra buffer for alignment and future fields
 }
 
 /// Feature flags for optional capabilities
