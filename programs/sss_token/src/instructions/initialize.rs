@@ -14,14 +14,12 @@ pub struct Initialize<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
     
-    /// CHECK: This will be the mint, validated in handler
+    /// CHECK: This will be initialized as the mint by token-2022 program
     #[account(
-        init,
-        payer = payer,
-        space = 82,
-        owner = token_2022_program.key(),
+        mut,
+        owner = System::id() @ SssTokenError::InvalidAuthority
     )]
-    pub mint: AccountInfo<'info>,
+    pub mint: Signer<'info>,
     
     #[account(
         init,
@@ -57,10 +55,6 @@ pub fn handler(ctx: Context<Initialize>, config: StablecoinConfig) -> Result<()>
     state.total_burned = 0;
     state.bump = bump;
     state.version = 1;
-    
-    // Note: In a real implementation, we would initialize the Token-2022 mint
-    // with the appropriate extensions here. For simplicity, this assumes
-    // the mint was pre-initialized with the required extensions.
     
     msg!("Stablecoin initialized: {} ({}) with features: permanent_delegate={}, transfer_hook={}",
         state.name,
