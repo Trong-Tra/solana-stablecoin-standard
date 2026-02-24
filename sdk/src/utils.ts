@@ -2,12 +2,13 @@ import { PublicKey, Connection } from '@solana/web3.js';
 import BN from 'bn.js';
 
 // Program IDs (replace with actual deployed addresses)
+// Using SystemProgram as placeholder - replace with real program IDs after deployment
 export const SSS_TOKEN_PROGRAM_ID = new PublicKey(
-  'SSSs1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+  '11111111111111111111111111111111'
 );
 
 export const SSS_TRANSFER_HOOK_PROGRAM_ID = new PublicKey(
-  'SSSh1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+  '11111111111111111111111111111112'
 );
 
 // PDA seeds
