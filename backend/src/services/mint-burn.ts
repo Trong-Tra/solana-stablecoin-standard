@@ -1,6 +1,7 @@
-import { Connection, PublicKey, Keypair } from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { Logger } from 'winston';
 import { SolanaStablecoin } from '../../../sdk/src';
+import BN from 'bn.js';
 
 interface MintRequest {
   id: string;
@@ -101,8 +102,8 @@ export class MintBurnService {
       const signature = await stablecoin.mint({
         recipient: new PublicKey(request.recipient),
         amount: stablecoin['config'].decimals === 6 
-          ? BigInt(request.amount * 1_000_000)
-          : BigInt(request.amount),
+          ? new BN(request.amount * 1_000_000)
+          : new BN(request.amount),
       });
 
       request.status = 'executed';
@@ -162,8 +163,8 @@ export class MintBurnService {
     try {
       const signature = await stablecoin.burn({
         amount: stablecoin['config'].decimals === 6 
-          ? BigInt(request.amount * 1_000_000)
-          : BigInt(request.amount),
+          ? new BN(request.amount * 1_000_000)
+          : new BN(request.amount),
         from: request.from ? new PublicKey(request.from) : undefined,
       });
 

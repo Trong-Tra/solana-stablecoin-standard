@@ -64,7 +64,7 @@ export class ComplianceService {
   async checkSanctions(address: string): Promise<SanctionsCheck> {
     // Check cache first
     const cached = this.sanctionsCache.get(address);
-    if (cached && this.isCacheValid(checkedAt)) {
+    if (cached && this.isCacheValid(cached.checkedAt)) {
       return cached;
     }
 

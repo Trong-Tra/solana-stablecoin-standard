@@ -6,6 +6,7 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
+COPY sdk/tsconfig.json ./sdk/
 
 # Install dependencies
 RUN npm ci
@@ -14,8 +15,11 @@ RUN npm ci
 COPY backend/src ./backend/src
 COPY sdk/src ./sdk/src
 
-# Build TypeScript
+# Build SDK
 RUN npm run build
+
+# Build backend
+RUN npx tsc -p tsconfig.json --outDir ./dist
 
 # Production stage
 FROM node:20-alpine AS production
@@ -27,6 +31,7 @@ COPY package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
 # Copy built files
+COPY --from=builder /app/sdk/dist ./sdk/dist
 COPY --from=builder /app/dist ./dist
 
 # Create logs directory
