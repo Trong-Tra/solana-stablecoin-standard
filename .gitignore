@@ -1,0 +1,38 @@
+# Rust
+target/
+Cargo.lock
+**/*.rs.bk
+
+# Node
+node_modules/
+dist/
+build/
+*.log
+package-lock.json
+yarn.lock
+
+# Solana
+.anchor/
+.DS_Store
+test-ledger/
+*.key
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker
+*.tar.gz
+data/
+
+# Test artifacts
+*.test.ts.snap
+.nyc_output/
+coverage/
