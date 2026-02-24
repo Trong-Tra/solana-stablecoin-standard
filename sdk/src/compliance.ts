@@ -8,7 +8,7 @@ export class ComplianceModule {
   constructor(
     private connection: Connection,
     private program: Program,
-    private mint: PublicKey,
+    private mintPubkey: PublicKey,
     private authority: Keypair,
     private features: { permanentDelegate: boolean; transferHook: boolean }
   ) {}
@@ -26,7 +26,7 @@ export class ComplianceModule {
   async addToBlacklist(params: BlacklistParams): Promise<string> {
     this.ensureEnabled();
 
-    const blacklistPDA = getBlacklistPDA(this.mint, params.address)[0];
+    const blacklistPDA = getBlacklistPDA(this.mintPubkey, params.address)[0];
 
     const tx = await this.program.methods
       .addToBlacklist(
@@ -52,7 +52,7 @@ export class ComplianceModule {
   async removeFromBlacklist(address: PublicKey): Promise<string> {
     this.ensureEnabled();
 
-    const blacklistPDA = getBlacklistPDA(this.mint, address)[0];
+    const blacklistPDA = getBlacklistPDA(this.mintPubkey, address)[0];
 
     const tx = await this.program.methods
       .removeFromBlacklist(address)
@@ -80,14 +80,14 @@ export class ComplianceModule {
     }
 
     const amount = toBN(params.amount);
-    const blacklistPDA = getBlacklistPDA(this.mint, params.from)[0];
+    const blacklistPDA = getBlacklistPDA(this.mintPubkey, params.from)[0];
 
     const tx = await this.program.methods
       .seizeTokens(amount)
       .accounts({
         authority: this.authority.publicKey,
         stablecoinState: this.getStatePDA(),
-        mint: this.mint,
+        mint: this.mintPubkey,
         from: params.from,
         to: params.to,
         blacklistEntry: blacklistPDA,
@@ -108,8 +108,8 @@ export class ComplianceModule {
     }
 
     try {
-      const blacklistPDA = getBlacklistPDA(this.mint, address)[0];
-      await this.program.account.blacklistEntry.fetch(blacklistPDA);
+      const blacklistPDA = getBlacklistPDA(this.mintPubkey, address)[0];
+      await (this.program.account as any).blacklistEntry.fetch(blacklistPDA);
       return true;
     } catch {
       return false;
@@ -125,8 +125,8 @@ export class ComplianceModule {
     }
 
     try {
-      const blacklistPDA = getBlacklistPDA(this.mint, address)[0];
-      const entry = await this.program.account.blacklistEntry.fetch(blacklistPDA);
+      const blacklistPDA = getBlacklistPDA(this.mintPubkey, address)[0];
+      const entry = await (this.program.account as any).blacklistEntry.fetch(blacklistPDA);
       return {
         address: entry.address,
         mint: entry.mint,
@@ -147,7 +147,7 @@ export class ComplianceModule {
 
   private getStatePDA(): PublicKey {
     const [pda] = PublicKey.findProgramAddressSync(
-      [Buffer.from('stablecoin_state'), this.mint.toBuffer()],
+      [Buffer.from('stablecoin_state'), this.mintPubkey.toBuffer()],
       this.program.programId
     );
     return pda;

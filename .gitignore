@@ -8,8 +8,6 @@ node_modules/
 dist/
 build/
 *.log
-package-lock.json
-yarn.lock
 
 # Solana
 .anchor/

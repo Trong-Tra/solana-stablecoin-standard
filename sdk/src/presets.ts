@@ -43,10 +43,10 @@ export interface PresetInfo {
   description: string;
   useCase: string;
   extensions: ExtensionConfig;
-  compliance: 'minimal' | 'full';
+  compliance: 'minimal' | 'full' | 'custom';
 }
 
-export const PRESET_INFO: Record<Preset, PresetInfo> = {
+export const PRESET_INFO: Record<Presets, PresetInfo> = {
   [Presets.SSS_1]: {
     name: 'Minimal Stablecoin',
     description: 'Basic stablecoin with mint authority, freeze authority, and metadata.',

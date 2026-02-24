@@ -22,7 +22,7 @@ export interface SSS2Config extends StablecoinConfig {
 
 export interface CustomConfig extends StablecoinConfig {
   preset: Presets.CUSTOM;
-  extensions: Partial<ExtensionConfig>;
+  extensions: ExtensionConfig;
 }
 
 export function validateConfig(config: StablecoinConfig): void {

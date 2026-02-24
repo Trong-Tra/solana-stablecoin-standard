@@ -1,9 +1,9 @@
-import { Connection, Keypair, PublicKey, Transaction } from '@solana/web3.js';
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import BN from 'bn.js';
 import { ComplianceModule } from './compliance';
 import { StablecoinConfig, validateConfig, toProgramConfig } from './config';
-import { Presets, getExtensionsForPreset } from './presets';
+import { Presets } from './presets';
 import {
   StablecoinState,
   MintParams,
@@ -18,15 +18,14 @@ import {
   getMinterStatePDA,
   getBurnerStatePDA,
   toBN,
-  confirmTransaction,
 } from './utils';
 import IDL from './idl/sss_token.json';
 
 export class SolanaStablecoin {
   private constructor(
     public readonly connection: Connection,
-    public readonly program: Program,
-    public readonly mint: PublicKey,
+    public readonly program: any,
+    public readonly mintPubkey: PublicKey,
     public readonly authority: Keypair,
     public readonly config: StablecoinConfig,
     public readonly compliance: ComplianceModule
@@ -43,12 +42,13 @@ export class SolanaStablecoin {
     // Validate config
     validateConfig(config);
 
-    const wallet = new Wallet(authority);
-    const provider = new AnchorProvider(connection, wallet, {
-      commitment: 'confirmed',
-    });
+    const wallet = new AnchorProvider(
+      connection,
+      { publicKey: authority.publicKey, signAllTransactions: async (txs) => txs, signTransaction: async (tx) => tx },
+      { commitment: 'confirmed' }
+    );
 
-    const program = new Program(IDL as any, SSS_TOKEN_PROGRAM_ID, provider);
+    const program: any = new Program(IDL as any, wallet);
 
     // Generate mint keypair
     const mintKeypair = Keypair.generate();
@@ -96,22 +96,23 @@ export class SolanaStablecoin {
    */
   static async load(
     connection: Connection,
-    mint: PublicKey,
+    mintAddress: PublicKey,
     authority: Keypair
   ): Promise<SolanaStablecoin> {
-    const wallet = new Wallet(authority);
-    const provider = new AnchorProvider(connection, wallet, {
-      commitment: 'confirmed',
-    });
+    const wallet = new AnchorProvider(
+      connection,
+      { publicKey: authority.publicKey, signAllTransactions: async (txs) => txs, signTransaction: async (tx) => tx },
+      { commitment: 'confirmed' }
+    );
 
-    const program = new Program(IDL as any, SSS_TOKEN_PROGRAM_ID, provider);
+    const program: any = new Program(IDL as any, wallet);
 
     // Fetch state
-    const [statePDA] = getStablecoinStatePDA(mint);
-    const state = await program.account.stablecoinState.fetch(statePDA);
+    const [statePDA] = getStablecoinStatePDA(mintAddress);
+    const state = await (program.account as any).stablecoinState.fetch(statePDA);
 
     // Reconstruct config
-    const config: StablecoinConfig = {
+    const reconfig: StablecoinConfig = {
       name: state.name,
       symbol: state.symbol,
       uri: state.uri,
@@ -129,17 +130,17 @@ export class SolanaStablecoin {
     const compliance = new ComplianceModule(
       connection,
       program,
-      mint,
+      mintAddress,
       authority,
-      config.extensions
+      reconfig.extensions
     );
 
     return new SolanaStablecoin(
       connection,
       program,
-      mint,
+      mintAddress,
       authority,
-      config,
+      reconfig,
       compliance
     );
   }
@@ -149,9 +150,9 @@ export class SolanaStablecoin {
    */
   async mint(params: MintParams): Promise<string> {
     const amount = toBN(params.amount);
-    const [statePDA] = getStablecoinStatePDA(this.mint);
+    const [statePDA] = getStablecoinStatePDA(this.mintPubkey);
     const [minterPDA] = getMinterStatePDA(
-      this.mint,
+      this.mintPubkey,
       params.minter || this.authority.publicKey
     );
 
@@ -160,7 +161,7 @@ export class SolanaStablecoin {
       .accounts({
         authority: this.authority.publicKey,
         stablecoinState: statePDA,
-        mint: this.mint,
+        mint: this.mintPubkey,
         to: params.recipient,
         minterState: minterPDA,
         token2022Program: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),
@@ -176,18 +177,19 @@ export class SolanaStablecoin {
    */
   async burn(params: BurnParams): Promise<string> {
     const amount = toBN(params.amount);
-    const [statePDA] = getStablecoinStatePDA(this.mint);
+    const [statePDA] = getStablecoinStatePDA(this.mintPubkey);
+
+    const accounts: any = {
+      authority: this.authority.publicKey,
+      stablecoinState: statePDA,
+      mint: this.mintPubkey,
+      from: params.from || this.authority.publicKey,
+      token2022Program: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),
+    };
 
     const tx = await this.program.methods
       .burnTokens(amount)
-      .accounts({
-        authority: this.authority.publicKey,
-        stablecoinState: statePDA,
-        mint: this.mint,
-        from: params.from || this.authority.publicKey,
-        burnerState: null,
-        token2022Program: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),
-      })
+      .accounts(accounts)
       .signers([this.authority])
       .rpc();
 
@@ -198,14 +200,14 @@ export class SolanaStablecoin {
    * Freeze an account
    */
   async freeze(params: FreezeParams): Promise<string> {
-    const [statePDA] = getStablecoinStatePDA(this.mint);
+    const [statePDA] = getStablecoinStatePDA(this.mintPubkey);
 
     const tx = await this.program.methods
       .freezeAccount()
       .accounts({
         authority: this.authority.publicKey,
         stablecoinState: statePDA,
-        mint: this.mint,
+        mint: this.mintPubkey,
         targetAccount: params.targetAccount,
         token2022Program: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),
       })
@@ -219,14 +221,14 @@ export class SolanaStablecoin {
    * Thaw (unfreeze) an account
    */
   async thaw(params: FreezeParams): Promise<string> {
-    const [statePDA] = getStablecoinStatePDA(this.mint);
+    const [statePDA] = getStablecoinStatePDA(this.mintPubkey);
 
     const tx = await this.program.methods
       .thawAccount()
       .accounts({
         authority: this.authority.publicKey,
         stablecoinState: statePDA,
-        mint: this.mint,
+        mint: this.mintPubkey,
         targetAccount: params.targetAccount,
         token2022Program: new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb'),
       })
@@ -240,7 +242,7 @@ export class SolanaStablecoin {
    * Pause all transfers
    */
   async pause(): Promise<string> {
-    const [statePDA] = getStablecoinStatePDA(this.mint);
+    const [statePDA] = getStablecoinStatePDA(this.mintPubkey);
 
     const tx = await this.program.methods
       .pause()
@@ -258,7 +260,7 @@ export class SolanaStablecoin {
    * Unpause transfers
    */
   async unpause(): Promise<string> {
-    const [statePDA] = getStablecoinStatePDA(this.mint);
+    const [statePDA] = getStablecoinStatePDA(this.mintPubkey);
 
     const tx = await this.program.methods
       .unpause()
@@ -277,18 +279,17 @@ export class SolanaStablecoin {
    */
   async updateMinter(params: UpdateMinterParams): Promise<string> {
     const quota = toBN(params.quota);
-    const [statePDA] = getStablecoinStatePDA(this.mint);
-    const [minterPDA] = getMinterStatePDA(this.mint, params.minter);
+    const [statePDA] = getStablecoinStatePDA(this.mintPubkey);
+    const [minterPDA] = getMinterStatePDA(this.mintPubkey, params.minter);
 
     const tx = await this.program.methods
       .updateMinter(params.minter, quota, params.active)
       .accounts({
         authority: this.authority.publicKey,
         stablecoinState: statePDA,
-        mint: this.mint,
+        mint: this.mintPubkey,
         target: params.minter,
         minterState: minterPDA,
-        burnerState: null,
         systemProgram: new PublicKey('11111111111111111111111111111111'),
       })
       .signers([this.authority])
@@ -301,17 +302,16 @@ export class SolanaStablecoin {
    * Update burner
    */
   async updateBurner(params: UpdateBurnerParams): Promise<string> {
-    const [statePDA] = getStablecoinStatePDA(this.mint);
-    const [burnerPDA] = getBurnerStatePDA(this.mint, params.burner);
+    const [statePDA] = getStablecoinStatePDA(this.mintPubkey);
+    const [burnerPDA] = getBurnerStatePDA(this.mintPubkey, params.burner);
 
     const tx = await this.program.methods
       .updateBurner(params.burner, params.active)
       .accounts({
         authority: this.authority.publicKey,
         stablecoinState: statePDA,
-        mint: this.mint,
+        mint: this.mintPubkey,
         target: params.burner,
-        minterState: null,
         burnerState: burnerPDA,
         systemProgram: new PublicKey('11111111111111111111111111111111'),
       })
@@ -325,7 +325,7 @@ export class SolanaStablecoin {
    * Transfer authority
    */
   async transferAuthority(newAuthority: PublicKey): Promise<string> {
-    const [statePDA] = getStablecoinStatePDA(this.mint);
+    const [statePDA] = getStablecoinStatePDA(this.mintPubkey);
 
     const tx = await this.program.methods
       .transferAuthority(newAuthority)
@@ -344,8 +344,8 @@ export class SolanaStablecoin {
    * Get stablecoin state
    */
   async getState(): Promise<StablecoinState> {
-    const [statePDA] = getStablecoinStatePDA(this.mint);
-    const state = await this.program.account.stablecoinState.fetch(statePDA);
+    const [statePDA] = getStablecoinStatePDA(this.mintPubkey);
+    const state = await (this.program.account as any).stablecoinState.fetch(statePDA);
 
     return {
       masterAuthority: state.masterAuthority,
