@@ -6,7 +6,7 @@ use spl_tlv_account_resolution::state::ExtraAccountMetaList;
 mod state;
 use state::*;
 
-declare_id!("SSSh1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+declare_id!("SSSh1yQf3L1UvAbq3jS1T3vR2Q3jL5K7mN8pP4qR5sT");
 
 /// Transfer hook for SSS-2 compliance
 /// Enforces blacklist checks on every transfer

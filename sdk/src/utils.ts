@@ -4,11 +4,11 @@ import BN from 'bn.js';
 // Program IDs (replace with actual deployed addresses)
 // Using SystemProgram as placeholder - replace with real program IDs after deployment
 export const SSS_TOKEN_PROGRAM_ID = new PublicKey(
-  '11111111111111111111111111111111'
+  'SSSs1yQf3L1UvAbq3jS1T3vR2Q3jL5K7mN8pP4qR5sT'
 );
 
 export const SSS_TRANSFER_HOOK_PROGRAM_ID = new PublicKey(
-  '11111111111111111111111111111112'
+  'SSSh1yQf3L1UvAbq3jS1T3vR2Q3jL5K7mN8pP4qR5sT'
 );
 
 // PDA seeds

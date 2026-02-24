@@ -12,7 +12,7 @@ use error::*;
 use instructions::*;
 use state::*;
 
-declare_id!("SSSs1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+declare_id!("SSSs1yQf3L1UvAbq3jS1T3vR2Q3jL5K7mN8pP4qR5sT");
 
 #[program]
 pub mod sss_token {
