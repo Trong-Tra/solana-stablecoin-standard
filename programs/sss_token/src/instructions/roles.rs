@@ -5,13 +5,13 @@ use crate::{
 };
 
 #[derive(Accounts)]
-pub struct UpdateRole<'info> {
+pub struct UpdateMinterRole<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
     
     #[account(
         mut,
-        seeds = [STABLECOIN_STATE_SEED, mint.as_ref()],
+        seeds = [STABLECOIN_STATE_SEED, mint.key().as_ref()],
         bump = stablecoin_state.bump,
         constraint = authority.key() == stablecoin_state.master_authority @ SssTokenError::Unauthorized
     )]
@@ -20,45 +20,57 @@ pub struct UpdateRole<'info> {
     /// CHECK: The mint address
     pub mint: AccountInfo<'info>,
     
-    /// CHECK: The target minter/burner address
+    /// CHECK: The target minter address
     pub target: AccountInfo<'info>,
     
     #[account(
-        init_if_needed,
-        payer = authority,
-        space = MinterState::LEN,
+        mut,
         seeds = [MINTER_STATE_SEED, mint.key().as_ref(), target.key().as_ref()],
-        bump
+        bump = minter_state.bump
     )]
-    pub minter_state: Option<Account<'info, MinterState>>,
+    pub minter_state: Account<'info, MinterState>,
+}
+
+#[derive(Accounts)]
+pub struct UpdateBurnerRole<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
     
     #[account(
-        init_if_needed,
-        payer = authority,
-        space = BurnerState::LEN,
-        seeds = [BURNER_STATE_SEED, mint.key().as_ref(), target.key().as_ref()],
-        bump
+        mut,
+        seeds = [STABLECOIN_STATE_SEED, mint.key().as_ref()],
+        bump = stablecoin_state.bump,
+        constraint = authority.key() == stablecoin_state.master_authority @ SssTokenError::Unauthorized
     )]
-    pub burner_state: Option<Account<'info, BurnerState>>,
+    pub stablecoin_state: Account<'info, StablecoinState>,
     
-    pub system_program: Program<'info, System>,
+    /// CHECK: The mint address
+    pub mint: AccountInfo<'info>,
+    
+    /// CHECK: The target burner address
+    pub target: AccountInfo<'info>,
+    
+    #[account(
+        mut,
+        seeds = [BURNER_STATE_SEED, mint.key().as_ref(), target.key().as_ref()],
+        bump = burner_state.bump
+    )]
+    pub burner_state: Account<'info, BurnerState>,
 }
 
 pub fn handler_update_minter(
-    ctx: Context<UpdateRole>,
+    ctx: Context<UpdateMinterRole>,
     minter: Pubkey,
     quota: u64,
     active: bool,
 ) -> Result<()> {
-    let minter_state = ctx.accounts.minter_state.as_mut()
-        .ok_or(SssTokenError::InvalidPreset)?;
+    let minter_state = &mut ctx.accounts.minter_state;
     
     minter_state.minter = minter;
     minter_state.mint = ctx.accounts.mint.key();
     minter_state.quota = quota;
     minter_state.active = active;
     minter_state.minted = if !active { 0 } else { minter_state.minted };
-    minter_state.bump = ctx.bumps.minter_state.unwrap();
     
     msg!(
         "Minter {} updated: active={}, quota={}",
@@ -71,17 +83,15 @@ pub fn handler_update_minter(
 }
 
 pub fn handler_update_burner(
-    ctx: Context<UpdateRole>,
+    ctx: Context<UpdateBurnerRole>,
     burner: Pubkey,
     active: bool,
 ) -> Result<()> {
-    let burner_state = ctx.accounts.burner_state.as_mut()
-        .ok_or(SssTokenError::InvalidPreset)?;
+    let burner_state = &mut ctx.accounts.burner_state;
     
     burner_state.burner = burner;
     burner_state.mint = ctx.accounts.mint.key();
     burner_state.active = active;
-    burner_state.bump = ctx.bumps.burner_state.unwrap();
     
     msg!(
         "Burner {} updated: active={}",

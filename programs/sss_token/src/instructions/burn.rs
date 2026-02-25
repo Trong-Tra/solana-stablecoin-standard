@@ -32,12 +32,12 @@ pub struct BurnTokens<'info> {
     )]
     pub from: InterfaceAccount<'info, InterfaceTokenAccount>,
     
-    /// CHECK: Burner state PDA (optional)
+    /// CHECK: Burner state PDA
     #[account(
         seeds = [BURNER_STATE_SEED, mint.key().as_ref(), authority.key().as_ref()],
-        bump
+        bump = burner_state.bump
     )]
-    pub burner_state: Option<Account<'info, BurnerState>>,
+    pub burner_state: Account<'info, BurnerState>,
     
     pub token_2022_program: Program<'info, Token2022>,
 }
@@ -55,9 +55,7 @@ pub fn handler(ctx: Context<BurnTokens>, amount: u64) -> Result<()> {
     // Verify authority is owner, burner, or master
     let is_owner = ctx.accounts.from.owner == ctx.accounts.authority.key();
     let is_master = ctx.accounts.authority.key() == state.master_authority;
-    let is_designated_burner = ctx.accounts.burner_state.as_ref()
-        .map(|b| b.active)
-        .unwrap_or(false);
+    let is_designated_burner = ctx.accounts.burner_state.active;
     
     require!(
         is_owner || is_master || is_designated_burner,

@@ -5,6 +5,7 @@ use crate::{
 };
 
 #[derive(Accounts)]
+#[instruction(address: Pubkey)]
 pub struct BlacklistManagement<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
@@ -21,15 +22,34 @@ pub struct BlacklistManagement<'info> {
         init_if_needed,
         payer = authority,
         space = BlacklistEntry::LEN,
-        seeds = [BLACKLIST_SEED, stablecoin_state.mint.as_ref(), target_address.as_ref()],
+        seeds = [BLACKLIST_SEED, stablecoin_state.mint.as_ref(), address.as_ref()],
         bump
     )]
     pub blacklist_entry: Account<'info, BlacklistEntry>,
     
-    /// CHECK: Target address to blacklist/unblacklist
-    pub target_address: AccountInfo<'info>,
-    
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(address: Pubkey)]
+pub struct BlacklistRemove<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    
+    #[account(
+        seeds = [STABLECOIN_STATE_SEED, stablecoin_state.mint.as_ref()],
+        bump = stablecoin_state.bump,
+        constraint = authority.key() == stablecoin_state.master_authority @ SssTokenError::Unauthorized,
+    )]
+    pub stablecoin_state: Account<'info, StablecoinState>,
+    
+    #[account(
+        mut,
+        seeds = [BLACKLIST_SEED, stablecoin_state.mint.as_ref(), address.as_ref()],
+        bump,
+        close = authority
+    )]
+    pub blacklist_entry: Account<'info, BlacklistEntry>,
 }
 
 pub fn handler_add(
@@ -65,16 +85,15 @@ pub fn handler_add(
 }
 
 pub fn handler_remove(
-    ctx: Context<BlacklistManagement>,
+    ctx: Context<BlacklistRemove>,
     address: Pubkey,
 ) -> Result<()> {
-    let entry = &mut ctx.accounts.blacklist_entry;
+    let entry = &ctx.accounts.blacklist_entry;
     let state = &ctx.accounts.stablecoin_state;
     
-    // Clear the entry (mark as removed by zeroing)
     let removed_at = Clock::get()?.unix_timestamp;
     
-    // Emit event before clearing
+    // Emit event before closing
     emit!(BlacklistEvent {
         mint: state.mint,
         address,
@@ -84,12 +103,9 @@ pub fn handler_remove(
         authority: ctx.accounts.authority.key(),
     });
     
-    // Close the account by draining lamports back to authority
-    let entry_lamports = entry.get_lamports();
-    **ctx.accounts.authority.to_account_info().try_borrow_mut_lamports()? += entry_lamports;
-    **entry.to_account_info().try_borrow_mut_lamports()? = 0;
-    
     msg!("Address removed from blacklist: {}", address);
+    
+    // Account will be closed automatically due to `close = authority` constraint
     
     Ok(())
 }

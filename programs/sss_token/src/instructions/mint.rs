@@ -37,14 +37,14 @@ pub struct MintTokens<'info> {
     #[account(
         mut,
         seeds = [MINTER_STATE_SEED, mint.key().as_ref(), authority.key().as_ref()],
-        bump
+        bump = minter_state.bump
     )]
     pub minter_state: Account<'info, MinterState>,
     
     pub token_2022_program: Program<'info, Token2022>,
 }
 
-fn is_blacklisted(state: &StablecoinState, owner: &Pubkey, mint_bytes: &[u8]) -> bool {
+fn is_blacklisted(state: &StablecoinState, _owner: &Pubkey, _mint_bytes: &[u8]) -> bool {
     // Simplified check - in real implementation would check blacklist PDA
     // For SSS-2 with transfer hook, this is handled by the hook
     !state.features.transfer_hook && false // Placeholder

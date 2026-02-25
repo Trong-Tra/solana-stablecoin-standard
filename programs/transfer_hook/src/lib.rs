@@ -16,10 +16,11 @@ pub mod sss_transfer_hook {
 
     /// Initialize the transfer hook program
     pub fn initialize(ctx: Context<InitializeHook>) -> Result<()> {
-        let extra_account_metas = &mut ctx.accounts.extra_account_metas;
-        extra_account_metas.init(
-            &[], // No extra accounts required
-        )?;
+        let extra_account_metas_info = ctx.accounts.extra_account_metas.to_account_info();
+        
+        // Initialize the extra account meta list
+        let mut data = extra_account_metas_info.try_borrow_mut_data()?;
+        ExtraAccountMetaList::init::<ExecuteInstruction>(&mut data, &[])?;
         
         msg!("Transfer hook initialized");
         Ok(())
@@ -65,13 +66,13 @@ pub struct InitializeHook<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
     
-    /// CHECK: Extra account meta list account
+    /// CHECK: Extra account meta list account - initialized in instruction
     #[account(
         init,
         payer = payer,
-        space = ExtraAccountMetaList::size_of(0)?,
+        space = ExtraAccountMetaList::size_of(0).unwrap(),
     )]
-    pub extra_account_metas: UncheckedAccount<'info>,
+    pub extra_account_metas: AccountInfo<'info>,
     
     pub system_program: Program<'info, System>,
 }
@@ -79,13 +80,19 @@ pub struct InitializeHook<'info> {
 #[derive(Accounts)]
 pub struct ExecuteHook<'info> {
     /// CHECK: Source token account
-    pub source_token: Account<'info, TokenAccount>,
+    #[account(
+        token::token_program = anchor_spl::token_interface::ID,
+    )]
+    pub source_token: InterfaceAccount<'info, TokenAccount>,
     
     /// CHECK: Mint
     pub mint: UncheckedAccount<'info>,
     
     /// CHECK: Destination token account
-    pub destination_token: Account<'info, TokenAccount>,
+    #[account(
+        token::token_program = anchor_spl::token_interface::ID,
+    )]
+    pub destination_token: InterfaceAccount<'info, TokenAccount>,
     
     /// CHECK: Source owner
     pub source_owner: UncheckedAccount<'info>,

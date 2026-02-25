@@ -77,7 +77,7 @@ pub mod sss_token {
 
     /// Remove address from blacklist (SSS-2, requires blacklister role)
     pub fn remove_from_blacklist(
-        ctx: Context<BlacklistManagement>,
+        ctx: Context<BlacklistRemove>,
         address: Pubkey,
     ) -> Result<()> {
         instructions::blacklist::handler_remove(ctx, address)
@@ -93,7 +93,7 @@ pub mod sss_token {
 
     /// Update minter quota
     pub fn update_minter(
-        ctx: Context<UpdateRole>,
+        ctx: Context<UpdateMinterRole>,
         minter: Pubkey,
         quota: u64,
         active: bool,
@@ -103,7 +103,7 @@ pub mod sss_token {
 
     /// Update burner status
     pub fn update_burner(
-        ctx: Context<UpdateRole>,
+        ctx: Context<UpdateBurnerRole>,
         burner: Pubkey,
         active: bool,
     ) -> Result<()> {
