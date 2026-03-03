@@ -392,10 +392,6 @@ sss-token blacklist check <ADDRESS>
 Keep this information secure and accessible:
 
 ```
-Superteam Brazil:
-- Discord: discord.gg/superteambrasil
-- Twitter: @SuperteamBR
-
 Solana Foundation:
 - Security: security@solana.foundation
 

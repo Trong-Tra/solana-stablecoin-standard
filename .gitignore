@@ -34,3 +34,6 @@ data/
 *.test.ts.snap
 .nyc_output/
 coverage/
+
+# Logs
+logs/*.log
