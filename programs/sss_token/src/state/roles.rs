@@ -32,7 +32,12 @@ pub const ROLE_STATE_SEED: &[u8] = b"role_state";
 /// Get PDA for role state
 pub fn get_role_state_pda(mint: &Pubkey, holder: &Pubkey, role: Role) -> (Pubkey, u8) {
     Pubkey::find_program_address(
-        &[ROLE_STATE_SEED, mint.as_ref(), holder.as_ref(), &[role as u8]],
+        &[
+            ROLE_STATE_SEED,
+            mint.as_ref(),
+            holder.as_ref(),
+            &[role as u8],
+        ],
         &crate::ID,
     )
 }

@@ -1,39 +1,39 @@
 use anchor_lang::prelude::*;
 
+pub mod blacklist;
 pub mod config;
 pub mod roles;
-pub mod blacklist;
 
+pub use blacklist::*;
 pub use config::*;
 pub use roles::*;
-pub use blacklist::*;
 
 /// Stablecoin configuration - stored in PDA
 #[account]
 pub struct StablecoinState {
     /// Authority that controls the stablecoin
     pub master_authority: Pubkey,
-    
+
     /// Mint address of the stablecoin
     pub mint: Pubkey,
-    
+
     /// Stablecoin metadata
     pub name: String,
     pub symbol: String,
     pub uri: String,
     pub decimals: u8,
-    
+
     /// Feature flags
     pub features: FeatureFlags,
-    
+
     /// Current state
     pub paused: bool,
     pub total_minted: u64,
     pub total_burned: u64,
-    
+
     /// Bump seed for PDA
     pub bump: u8,
-    
+
     /// Version for migrations
     pub version: u8,
 }
@@ -77,7 +77,7 @@ impl FeatureFlags {
         default_account_frozen: false,
         confidential_transfers: false,
     };
-    
+
     pub const SSS2: Self = Self {
         permanent_delegate: true,
         transfer_hook: true,
@@ -101,13 +101,25 @@ pub struct StablecoinConfig {
 
 impl StablecoinConfig {
     pub fn validate(&self) -> Result<()> {
-        require!(self.decimals <= 9, crate::error::SssTokenError::InvalidDecimals);
-        require!(self.name.len() <= 32, crate::error::SssTokenError::NameTooLong);
-        require!(self.symbol.len() <= 10, crate::error::SssTokenError::SymbolTooLong);
-        require!(self.uri.len() <= 200, crate::error::SssTokenError::UriTooLong);
+        require!(
+            self.decimals <= 9,
+            crate::error::SssTokenError::InvalidDecimals
+        );
+        require!(
+            self.name.len() <= 32,
+            crate::error::SssTokenError::NameTooLong
+        );
+        require!(
+            self.symbol.len() <= 10,
+            crate::error::SssTokenError::SymbolTooLong
+        );
+        require!(
+            self.uri.len() <= 200,
+            crate::error::SssTokenError::UriTooLong
+        );
         Ok(())
     }
-    
+
     pub fn to_feature_flags(&self) -> FeatureFlags {
         FeatureFlags {
             permanent_delegate: self.enable_permanent_delegate,

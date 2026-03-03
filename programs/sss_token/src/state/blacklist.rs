@@ -17,7 +17,7 @@ impl BlacklistEntry {
         32 + // mint
         104 + // reason (4 bytes length + 100 max chars)
         8 +  // added_at
-        32;  // added_by
+        32; // added_by
 }
 
 /// Blacklist event for audit trail
@@ -67,4 +67,3 @@ pub enum TokenAction {
     Thaw,
     Transfer,
 }
-

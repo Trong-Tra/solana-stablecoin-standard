@@ -1,36 +1,33 @@
+use crate::{error::SssTokenError, state::*};
 use anchor_lang::prelude::*;
 use anchor_spl::{
-    token_2022::{Token2022, MintTo, Burn, FreezeAccount, ThawAccount, CloseAccount},
-    token_interface::{Mint as InterfaceMint, TokenAccount as InterfaceTokenAccount},
     metadata::Metadata,
-};
-use crate::{
-    error::SssTokenError,
-    state::*,
+    token_2022::{Burn, CloseAccount, FreezeAccount, MintTo, ThawAccount, Token2022},
+    token_interface::{Mint as InterfaceMint, TokenAccount as InterfaceTokenAccount},
 };
 
-pub mod initialize;
-pub mod mint;
-pub mod burn;
-pub mod freeze;
-pub mod thaw;
-pub mod pause;
-pub mod blacklist;
-pub mod seize;
-pub mod roles;
 pub mod authority;
-pub mod metadata_ix;
+pub mod blacklist;
+pub mod burn;
 pub mod close;
+pub mod freeze;
+pub mod initialize;
+pub mod metadata_ix;
+pub mod mint;
+pub mod pause;
+pub mod roles;
+pub mod seize;
+pub mod thaw;
 
-pub use initialize::*;
-pub use mint::*;
-pub use burn::*;
-pub use freeze::*;
-pub use thaw::*;
-pub use pause::*;
-pub use blacklist::*;
-pub use seize::*;
-pub use roles::*;
 pub use authority::*;
-pub use metadata_ix::*;
+pub use blacklist::*;
+pub use burn::*;
 pub use close::*;
+pub use freeze::*;
+pub use initialize::*;
+pub use metadata_ix::*;
+pub use mint::*;
+pub use pause::*;
+pub use roles::*;
+pub use seize::*;
+pub use thaw::*;

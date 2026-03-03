@@ -9,10 +9,7 @@ pub const METADATA_SEED: &[u8] = b"metadata";
 
 /// Get PDA for stablecoin state
 pub fn get_stablecoin_state_pda(mint: &Pubkey) -> (Pubkey, u8) {
-    Pubkey::find_program_address(
-        &[STABLECOIN_STATE_SEED, mint.as_ref()],
-        &crate::ID,
-    )
+    Pubkey::find_program_address(&[STABLECOIN_STATE_SEED, mint.as_ref()], &crate::ID)
 }
 
 /// Get PDA for minter state
