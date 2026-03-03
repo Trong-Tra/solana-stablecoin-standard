@@ -4,7 +4,7 @@
 [![Anchor](https://img.shields.io/badge/Anchor-0.30.1-blue.svg)](https://github.com/coral-xyz/anchor)
 [![Solana](https://img.shields.io/badge/Solana-Devnet-green.svg)](https://solana.com)
 [![Build](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]()
-[![Tests](https://img.shields.io/badge/Tests-8%2F8%20Passing-success.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-192%2F192%20Passing-success.svg)]()
 
 > 🏆 **Superteam Brazil Bounty Submission** - A production-ready, modular SDK for creating regulated stablecoins on Solana
 
@@ -160,20 +160,15 @@ await stablecoin.compliance.seize({
 ```bash
 $ npm test
 
-  SDK Unit Tests
-    Presets
-      ✔ should return SSS-1 extensions
-      ✔ should return SSS-2 extensions
-    Config Validation
-      ✔ should validate correct config
-      ✔ should reject long name
-      ✔ should convert to program config
-    Utils
-      ✔ should convert to token amount
-      ✔ should convert from BN to readable
-      ✔ should generate valid PDA
+  192 passing (38ms)
 
-  8 passing (4ms)
+  Coverage:
+  - Config Module: 21 tests
+  - Utils Module: 43 tests  
+  - Presets Module: 31 tests
+  - Compliance Module: 20 tests
+  - Types Module: 34 tests
+  - SDK Integration: 43 tests
 ```
 
 ### ✅ Program Build
