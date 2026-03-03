@@ -1,14 +1,22 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { SssToken } from "../target/types/sss_token";
 import { PublicKey, Keypair, SystemProgram } from "@solana/web3.js";
 import { assert } from "chai";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import * as fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const idlPath = join(__dirname, '..', 'target', 'idl', 'sss_token.json');
+const idl = JSON.parse(fs.readFileSync(idlPath, 'utf-8'));
 
 describe("SSS Token Program", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.SssToken as Program<SssToken>;
+  const program = new Program(idl as any, provider);
   
   let authority: Keypair;
   let mint: Keypair;
@@ -18,7 +26,6 @@ describe("SSS Token Program", () => {
     authority = (provider.wallet as anchor.Wallet).payer;
     mint = Keypair.generate();
     
-    // Find PDA for stablecoin state
     [stablecoinState] = PublicKey.findProgramAddressSync(
       [Buffer.from("stablecoin_state"), mint.publicKey.toBuffer()],
       program.programId
@@ -27,18 +34,16 @@ describe("SSS Token Program", () => {
 
   describe("SSS-1: Minimal Stablecoin", () => {
     it("Should initialize SSS-1 stablecoin", async () => {
-      const config = {
-        name: "Test USD",
-        symbol: "TUSD",
-        uri: "https://test.com/metadata.json",
-        decimals: 6,
-        enablePermanentDelegate: false,
-        enableTransferHook: false,
-        defaultAccountFrozen: false,
-      };
-
       await program.methods
-        .initialize(config)
+        .initialize(
+          "Test USD",
+          "TUSD",
+          "https://test.com/metadata.json",
+          6,
+          false,
+          false,
+          false
+        )
         .accounts({
           payer: authority.publicKey,
           mint: mint.publicKey,
@@ -50,7 +55,7 @@ describe("SSS Token Program", () => {
         .signers([authority, mint])
         .rpc();
 
-      const state = await program.account.stablecoinState.fetch(stablecoinState);
+      const state = await (program.account as any).stablecoinState.fetch(stablecoinState);
       assert.equal(state.name, "Test USD");
       assert.equal(state.symbol, "TUSD");
       assert.equal(state.decimals, 6);
@@ -64,19 +69,17 @@ describe("SSS Token Program", () => {
         program.programId
       );
 
-      const invalidConfig = {
-        name: "A".repeat(33), // Too long
-        symbol: "TST",
-        uri: "https://test.com",
-        decimals: 6,
-        enablePermanentDelegate: false,
-        enableTransferHook: false,
-        defaultAccountFrozen: false,
-      };
-
       try {
         await program.methods
-          .initialize(invalidConfig)
+          .initialize(
+            "A".repeat(33),
+            "TST",
+            "https://test.com",
+            6,
+            false,
+            false,
+            false
+          )
           .accounts({
             payer: authority.publicKey,
             mint: newMint.publicKey,
@@ -105,7 +108,7 @@ describe("SSS Token Program", () => {
         .signers([authority])
         .rpc();
 
-      const state = await program.account.stablecoinState.fetch(stablecoinState);
+      const state = await (program.account as any).stablecoinState.fetch(stablecoinState);
       assert.isTrue(state.paused);
     });
 
@@ -119,7 +122,7 @@ describe("SSS Token Program", () => {
         .signers([authority])
         .rpc();
 
-      const state = await program.account.stablecoinState.fetch(stablecoinState);
+      const state = await (program.account as any).stablecoinState.fetch(stablecoinState);
       assert.isFalse(state.paused);
     });
   });

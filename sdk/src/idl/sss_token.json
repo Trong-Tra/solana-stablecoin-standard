@@ -1,191 +1,140 @@
 {
   "version": "0.1.0",
   "name": "sss_token",
+  "address": "DTQEHEAvQ1ZuPs3QEHbN8WJFp4C66PjUfCZWj6RLnaBn",
+  "metadata": {
+    "name": "sss_token",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "address": "DTQEHEAvQ1ZuPs3QEHbN8WJFp4C66PjUfCZWj6RLnaBn"
+  },
   "instructions": [
     {
       "name": "initialize",
       "accounts": [
-        { "name": "payer", "isMut": true, "isSigner": true },
-        { "name": "mint", "isMut": true, "isSigner": false },
-        { "name": "stablecoinState", "isMut": true, "isSigner": false },
-        { "name": "systemProgram", "isMut": false, "isSigner": false },
-        { "name": "token2022Program", "isMut": false, "isSigner": false },
-        { "name": "rent", "isMut": false, "isSigner": false }
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "mint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stablecoinState",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "token2022Program",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
       ],
       "args": [
-        { "name": "config", "type": { "defined": "StablecoinConfig" } }
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        },
+        {
+          "name": "enablePermanentDelegate",
+          "type": "bool"
+        },
+        {
+          "name": "enableTransferHook",
+          "type": "bool"
+        },
+        {
+          "name": "defaultAccountFrozen",
+          "type": "bool"
+        }
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
       ]
-    },
-    {
-      "name": "mintTokens",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": true, "isSigner": false },
-        { "name": "mint", "isMut": true, "isSigner": false },
-        { "name": "to", "isMut": true, "isSigner": false },
-        { "name": "minterState", "isMut": true, "isSigner": false },
-        { "name": "token2022Program", "isMut": false, "isSigner": false }
-      ],
-      "args": [
-        { "name": "amount", "type": "u64" }
-      ]
-    },
-    {
-      "name": "burnTokens",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": true, "isSigner": false },
-        { "name": "mint", "isMut": true, "isSigner": false },
-        { "name": "from", "isMut": true, "isSigner": false },
-        { "name": "burnerState", "isMut": false, "isSigner": false, "isOptional": true },
-        { "name": "token2022Program", "isMut": false, "isSigner": false }
-      ],
-      "args": [
-        { "name": "amount", "type": "u64" }
-      ]
-    },
-    {
-      "name": "freezeAccount",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": false, "isSigner": false },
-        { "name": "mint", "isMut": false, "isSigner": false },
-        { "name": "targetAccount", "isMut": true, "isSigner": false },
-        { "name": "token2022Program", "isMut": false, "isSigner": false }
-      ],
-      "args": []
-    },
-    {
-      "name": "thawAccount",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": false, "isSigner": false },
-        { "name": "mint", "isMut": false, "isSigner": false },
-        { "name": "targetAccount", "isMut": true, "isSigner": false },
-        { "name": "token2022Program", "isMut": false, "isSigner": false }
-      ],
-      "args": []
     },
     {
       "name": "pause",
       "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": true, "isSigner": false }
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "stablecoinState",
+          "isMut": true,
+          "isSigner": false
+        }
       ],
-      "args": []
+      "args": [],
+      "discriminator": [
+        211,
+        22,
+        221,
+        251,
+        74,
+        121,
+        193,
+        47
+      ]
     },
     {
       "name": "unpause",
       "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": true, "isSigner": false }
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "stablecoinState",
+          "isMut": true,
+          "isSigner": false
+        }
       ],
-      "args": []
-    },
-    {
-      "name": "addToBlacklist",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": false, "isSigner": false },
-        { "name": "blacklistEntry", "isMut": true, "isSigner": false },
-        { "name": "targetAddress", "isMut": false, "isSigner": false },
-        { "name": "systemProgram", "isMut": false, "isSigner": false }
-      ],
-      "args": [
-        { "name": "address", "type": "publicKey" },
-        { "name": "reason", "type": "string" }
+      "args": [],
+      "discriminator": [
+        169,
+        144,
+        4,
+        38,
+        10,
+        141,
+        188,
+        255
       ]
-    },
-    {
-      "name": "removeFromBlacklist",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": false, "isSigner": false },
-        { "name": "blacklistEntry", "isMut": true, "isSigner": false },
-        { "name": "targetAddress", "isMut": false, "isSigner": false },
-        { "name": "systemProgram", "isMut": false, "isSigner": false }
-      ],
-      "args": [
-        { "name": "address", "type": "publicKey" }
-      ]
-    },
-    {
-      "name": "seizeTokens",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": false, "isSigner": false },
-        { "name": "mint", "isMut": false, "isSigner": false },
-        { "name": "from", "isMut": true, "isSigner": false },
-        { "name": "to", "isMut": true, "isSigner": false },
-        { "name": "blacklistEntry", "isMut": false, "isSigner": false },
-        { "name": "token2022Program", "isMut": false, "isSigner": false }
-      ],
-      "args": [
-        { "name": "amount", "type": "u64" }
-      ]
-    },
-    {
-      "name": "updateMinter",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": false, "isSigner": false },
-        { "name": "mint", "isMut": false, "isSigner": false },
-        { "name": "target", "isMut": false, "isSigner": false },
-        { "name": "minterState", "isMut": true, "isSigner": false, "isOptional": true },
-        { "name": "burnerState", "isMut": false, "isSigner": false, "isOptional": true },
-        { "name": "systemProgram", "isMut": false, "isSigner": false }
-      ],
-      "args": [
-        { "name": "minter", "type": "publicKey" },
-        { "name": "quota", "type": "u64" },
-        { "name": "active", "type": "bool" }
-      ]
-    },
-    {
-      "name": "updateBurner",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": false, "isSigner": false },
-        { "name": "mint", "isMut": false, "isSigner": false },
-        { "name": "target", "isMut": false, "isSigner": false },
-        { "name": "minterState", "isMut": false, "isSigner": false, "isOptional": true },
-        { "name": "burnerState", "isMut": true, "isSigner": false, "isOptional": true },
-        { "name": "systemProgram", "isMut": false, "isSigner": false }
-      ],
-      "args": [
-        { "name": "burner", "type": "publicKey" },
-        { "name": "active", "type": "bool" }
-      ]
-    },
-    {
-      "name": "transferAuthority",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": true, "isSigner": false },
-        { "name": "newAuthority", "isMut": false, "isSigner": false }
-      ],
-      "args": [
-        { "name": "newAuthority", "type": "publicKey" }
-      ]
-    },
-    {
-      "name": "updateMetadata",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": true, "isSigner": false }
-      ],
-      "args": [
-        { "name": "uri", "type": "string" }
-      ]
-    },
-    {
-      "name": "closeStablecoin",
-      "accounts": [
-        { "name": "authority", "isMut": true, "isSigner": true },
-        { "name": "stablecoinState", "isMut": true, "isSigner": false },
-        { "name": "mint", "isMut": false, "isSigner": false }
-      ],
-      "args": []
     }
   ],
   "accounts": [
@@ -194,112 +143,94 @@
       "type": {
         "kind": "struct",
         "fields": [
-          { "name": "masterAuthority", "type": "publicKey" },
-          { "name": "mint", "type": "publicKey" },
-          { "name": "name", "type": "string" },
-          { "name": "symbol", "type": "string" },
-          { "name": "uri", "type": "string" },
-          { "name": "decimals", "type": "u8" },
-          { "name": "features", "type": { "defined": "FeatureFlags" } },
-          { "name": "paused", "type": "bool" },
-          { "name": "totalMinted", "type": "u64" },
-          { "name": "totalBurned", "type": "u64" },
-          { "name": "bump", "type": "u8" },
-          { "name": "version", "type": "u8" }
+          {
+            "name": "masterAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "features",
+            "type": {
+              "defined": "FeatureFlags"
+            }
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "totalMinted",
+            "type": "u64"
+          },
+          {
+            "name": "totalBurned",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u8"
+          }
         ]
-      }
-    },
-    {
-      "name": "MinterState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "minter", "type": "publicKey" },
-          { "name": "mint", "type": "publicKey" },
-          { "name": "quota", "type": "u64" },
-          { "name": "minted", "type": "u64" },
-          { "name": "active", "type": "bool" },
-          { "name": "bump", "type": "u8" }
-        ]
-      }
-    },
-    {
-      "name": "BurnerState",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "burner", "type": "publicKey" },
-          { "name": "mint", "type": "publicKey" },
-          { "name": "active", "type": "bool" },
-          { "name": "bump", "type": "u8" }
-        ]
-      }
-    },
-    {
-      "name": "BlacklistEntry",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "address", "type": "publicKey" },
-          { "name": "mint", "type": "publicKey" },
-          { "name": "reason", "type": "string" },
-          { "name": "addedAt", "type": "i64" },
-          { "name": "addedBy", "type": "publicKey" }
-        ]
-      }
+      },
+      "discriminator": [
+        107,
+        33,
+        134,
+        54,
+        129,
+        13,
+        187,
+        151
+      ]
     }
   ],
   "types": [
-    {
-      "name": "StablecoinConfig",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "name", "type": "string" },
-          { "name": "symbol", "type": "string" },
-          { "name": "uri", "type": "string" },
-          { "name": "decimals", "type": "u8" },
-          { "name": "enablePermanentDelegate", "type": "bool" },
-          { "name": "enableTransferHook", "type": "bool" },
-          { "name": "defaultAccountFrozen", "type": "bool" }
-        ]
-      }
-    },
     {
       "name": "FeatureFlags",
       "type": {
         "kind": "struct",
         "fields": [
-          { "name": "permanentDelegate", "type": "bool" },
-          { "name": "transferHook", "type": "bool" },
-          { "name": "defaultAccountFrozen", "type": "bool" },
-          { "name": "confidentialTransfers", "type": "bool" }
+          {
+            "name": "permanentDelegate",
+            "type": "bool"
+          },
+          {
+            "name": "transferHook",
+            "type": "bool"
+          },
+          {
+            "name": "defaultAccountFrozen",
+            "type": "bool"
+          },
+          {
+            "name": "confidentialTransfers",
+            "type": "bool"
+          }
         ]
       }
     }
-  ],
-  "errors": [
-    { "code": 6000, "name": "Unauthorized", "msg": "Unauthorized: caller does not have required role" },
-    { "code": 6001, "name": "InvalidPreset", "msg": "Invalid preset configuration" },
-    { "code": 6002, "name": "Paused", "msg": "Stablecoin is paused" },
-    { "code": 6003, "name": "AccountFrozen", "msg": "Account is frozen" },
-    { "code": 6004, "name": "Blacklisted", "msg": "Address is blacklisted" },
-    { "code": 6005, "name": "ComplianceNotEnabled", "msg": "Compliance module not enabled" },
-    { "code": 6006, "name": "QuotaExceeded", "msg": "Minter quota exceeded" },
-    { "code": 6007, "name": "InvalidAmount", "msg": "Invalid amount" },
-    { "code": 6008, "name": "InvalidDecimals", "msg": "Invalid decimals" },
-    { "code": 6009, "name": "NameTooLong", "msg": "Name too long (max 32 chars)" },
-    { "code": 6010, "name": "SymbolTooLong", "msg": "Symbol too long (max 10 chars)" },
-    { "code": 6011, "name": "UriTooLong", "msg": "URI too long (max 200 chars)" },
-    { "code": 6012, "name": "ReasonTooLong", "msg": "Reason too long (max 100 chars)" },
-    { "code": 6013, "name": "AlreadyExists", "msg": "Account already exists" },
-    { "code": 6014, "name": "NotFound", "msg": "Account not found" },
-    { "code": 6015, "name": "OutstandingSupply", "msg": "Cannot close: outstanding supply exists" },
-    { "code": 6016, "name": "NoPermanentDelegate", "msg": "Permanent delegate not set" },
-    { "code": 6017, "name": "TransferHookNotEnabled", "msg": "Transfer hook not enabled" },
-    { "code": 6018, "name": "InvalidAuthority", "msg": "Invalid authority" },
-    { "code": 6019, "name": "MathOverflow", "msg": "Math overflow" },
-    { "code": 6020, "name": "ExtensionError", "msg": "Token-2022 extension error" },
-    { "code": 6021, "name": "MetadataError", "msg": "Metadata error" }
   ]
 }
