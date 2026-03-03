@@ -45,7 +45,7 @@ The **Solana Stablecoin Standard (SSS)** provides institutions and builders with
 
 ```bash
 # Clone the repository
-git clone https://github.com/solanabr/solana-stablecoin-standard.git
+git clone https://github.com/Trong-Tra/solana-stablecoin-standard.git
 cd solana-stablecoin-standard
 
 # Install dependencies
